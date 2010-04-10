@@ -8,13 +8,12 @@ import trash || return -1
         # del
 
 INPUT="${1:-/dev/null}"
-AUDIO="${INPUT%.*}.mp3" # just assume its mp3-in-avi
-#AUDIOWAV="${INPUT%.*}.wav"
-#NEWAUDIO="${INPUT%.*}.aac"
-VIDEO="${INPUT%.*}.h264" # just assume its h264-in-avi (sometimes it lies and claims to be avc1, which it's not.
+AUDIO_FORMAT="${2:-mp3}" # just assume its mp3-in-avi
+AUDIO="${INPUT%.*}.$AUDIO_FORMAT" # just assume its mp3-in-avi
+VIDEO="${INPUT%.*}.h264" # just assume its h264-in-avi (sometimes it lies and claims to be avc1, which it's not. Well, its the same thing but yeah...
 OUTPUT="${INPUT%.*}.m4v"
 
-EXTMPLAYER="$HOME/.Trash/MPlayer OSX Extended.app/Contents/Resources/External_Binaries/mplayer-mt.app/Contents/MacOS"
+EXTMPLAYER="/Applications/MPlayer\ OSX\ Extended.app/Contents/Resources/Binaries/mpextended.mpBinaries/Contents/mpextended-mt.mpBinaries/Contents/MacOS"
 if test -e "$EXTMPLAYER/mplayer"
 then
     PATH="$PATH":"$EXTMPLAYER"
@@ -36,10 +35,13 @@ VIDEO_CODEC="${VIDEO_CODEC_WITH_END_BRACKET:0:$(( ${#VIDEO_CODEC_WITH_END_BRACKE
 
 RATE="$(mplayer "$INPUT" -dumpvideo -dumpfile "$VIDEO" | awk '/^VIDEO/ {print $5}')"
 
-echo encoding...
-#faac -r -o "$NEWAUDIO" "$AUDIOWAV" 
-afconvert -v "$AUDIO" -o "$OUTPUT" --file "mp4f"
-    # Slowest step, so print progress (-v)
+if [ x"$AUDIO_FORMAT" != x"aac" ]
+then
+    echo encoding...
+    #faac -r -o "$NEWAUDIO" "$AUDIOWAV" 
+    afconvert -v "$AUDIO" -o "$OUTPUT" --file "mp4f"
+        # Slowest step, so print progress (-v)
+fi
 
 echo muxing...
 #mp4creator -create="$NEWAUDIO" "$OUTPUT"
