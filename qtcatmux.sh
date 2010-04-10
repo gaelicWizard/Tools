@@ -28,22 +28,6 @@ do
     # Must -force-same-tracks in order for the alternative-audio switching to work, which must be enabled manually in QuickTime Pro (see below).
 done
 
-#catmovie -force-same-tracks -o "${TARGET}/main audio only.mov" \
-#    "$SOURCE_A" -track "The Fellowship of the Ring" -track "Text Track" \
-#    "$SOURCE_B" -track "The Fellowship of the Ring"
-#catmovie -force-same-tracks -o "${TARGET}/director commentary only.mov" \
-#    "$SOURCE_A" -track "Commentary by The Director and Writers" -track "Text Track" \
-#    "$SOURCE_B" -track "Commentary by The Director and Writers"
-#catmovie -force-same-tracks -o "${TARGET}/design commentary only.mov" \
-#    "$SOURCE_A" -track "Commentary by The Design Team" -track "Text Track" \
-#    "$SOURCE_B" -track "Commentary by The Design Team"
-#catmovie -force-same-tracks -o "${TARGET}/production commentary only.mov" \
-#    "$SOURCE_A" -track "Commentary by The Production/Post-Production Team" -track "Text Track" \
-#    "$SOURCE_B" -track "Commentary by The Production/Post-Production Team"
-#catmovie -force-same-tracks -o "${TARGET}/cast commentary only.mov" \
-#    "$SOURCE_A" -track "Commentary by The Cast" -track "Text Track" \
-#    "$SOURCE_B" -track "Commentary by The Cast"
-
 pushd "$TARGET" && {
     muxmovie -notrack "Text Track" -o "without chapters.mov" \
         "video only.mov" -track "Video Track" -track "Text Track" \
@@ -56,14 +40,6 @@ pushd "$TARGET" && {
 }
 
 catmovie -self-contained -o "${TARGET}.mov" "${TARGET}/final ref.mov"
-
-#muxmovie -o "${TARGET}/desplit.mov" \
-#    "${TARGET}/video only.mov" \
-#    "${TARGET}/main audio only.mov" -notrack "Text Track" \
-#    "${TARGET}/director commentary only.mov" -notrack "Text Track" \
-#    "${TARGET}/design commentary only.mov"  -notrack "Text Track" \
-#    "${TARGET}/production commentary only.mov"  -notrack "Text Track" \
-#    "${TARGET}/cast commentary only.mov"  -notrack "Text Track" 
 
 echo "Make sure to set the audio tracks to alternative and enable the chapter track." 1>&2
 open -a "QuickTime Player 7" "${TARGET}.mov"
