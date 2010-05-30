@@ -7,10 +7,12 @@ INCLUDE_TRACKS=( -track "Video Track" -track Stereo -track English -track "Engli
     # Unless named, all languages will be named Stereo, and there's no easy way to filter.
 SKIP_CHAPTERS=( -nochapter Opening -nochapter "Opening   " -nochapter Closing -nochapter "Closing   " )
 
-for i in `seq 1 11` `seq 14 26`
+for i in `seq 1 11` `seq 14 22`
+    # I failed to encode Volumes 12, 13, & 14 with chapter markers, so they must be done seperately.
+    # I've made the executive decision to pretend that the first movie is part of season 5 (for iTunes, but not here), so it has to be excluded here by only including disks 23 thru 26.
 do
-#    catmovie -auto-chapters -force-same-tracks "${INCLUDE_TRACKS[@]}" "${SKIP_CHAPTERS[@]}" -o "Bleach: Volume $i".mov \
-#        /Volumes/DroboMedia/iTunes\ Media/TV\ Shows/Bleach/Season*/$i-*.m4v
+    catmovie -auto-chapters -force-same-tracks "${INCLUDE_TRACKS[@]}" "${SKIP_CHAPTERS[@]}" -o "Bleach: Volume $i".mov \
+        /Volumes/DroboMedia/iTunes\ Media/TV\ Shows/Bleach/Season*/$i-*.m4v
 done
 
 catmovie -auto-chapters -force-same-tracks "${INCLUDE_TRACKS[@]}" -o "1 The Substitute.mov" "${SKIP_CHAPTERS[@]}" \
