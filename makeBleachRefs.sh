@@ -4,12 +4,13 @@ set -e
     # Be strict
 
 INCLUDE_TRACKS=( -track "Video Track" -track Stereo -track English -track "English Dub" )
+    # Unless named, all languages will be named Stereo, and there's no easy way to filter.
 SKIP_CHAPTERS=( -nochapter Opening -nochapter "Opening   " -nochapter Closing -nochapter "Closing   " )
 
 for i in `seq 1 11` `seq 14 26`
 do
-    #catmovie -auto-chapters -force-same-tracks "${INCLUDE_TRACKS[@]}" "${SKIP_CHAPTERS[@]}" -o "Bleach: Volume $i".mov \
-        /Volumes/DroboMedia/iTunes\ Media/TV\ Shows/Bleach/Season*/$i-*.m4v
+#    catmovie -auto-chapters -force-same-tracks "${INCLUDE_TRACKS[@]}" "${SKIP_CHAPTERS[@]}" -o "Bleach: Volume $i".mov \
+#        /Volumes/DroboMedia/iTunes\ Media/TV\ Shows/Bleach/Season*/$i-*.m4v
 done
 
 catmovie -auto-chapters -force-same-tracks "${INCLUDE_TRACKS[@]}" -o "1 The Substitute.mov" "${SKIP_CHAPTERS[@]}" \
