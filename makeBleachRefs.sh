@@ -6,6 +6,12 @@ set -e
 INCLUDE_TRACKS=( -track "Video Track" -track Stereo -track English -track "English Dub" )
 SKIP_CHAPTERS=( -nochapter Opening -nochapter "Opening   " -nochapter Closing -nochapter "Closing   " )
 
+for i in `seq 1 11` `seq 14 26`
+do
+    #catmovie -auto-chapters -force-same-tracks "${INCLUDE_TRACKS[@]}" "${SKIP_CHAPTERS[@]}" -o "Bleach: Volume $i".mov \
+        /Volumes/DroboMedia/iTunes\ Media/TV\ Shows/Bleach/Season*/$i-*.m4v
+done
+
 catmovie -auto-chapters -force-same-tracks "${INCLUDE_TRACKS[@]}" -o "1 The Substitute.mov" "${SKIP_CHAPTERS[@]}" \
     /Volumes/DroboMedia/iTunes\ Media/TV\ Shows/Bleach/Season\ 1/* "$@"
 catmovie -auto-chapters -force-same-tracks "${INCLUDE_TRACKS[@]}" -o "2 The Entry.mov" "${SKIP_CHAPTERS[@]}" \
