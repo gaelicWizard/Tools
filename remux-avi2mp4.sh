@@ -12,20 +12,28 @@ import path || return -1
 
 INPUT="${1:-/dev/null}"
 OUTPUT="${INPUT%%.*}.mp4"
+AUDIO_CODEC="copy"
 
 bashd_add_to_path_front ~/Projects/ffmpeg-x86_64.bundle/Contents/Tools
 
 VIDEO_FORMAT="$(ffplay -nodisp -an -vn -stats "$INPUT" 2>&1 | awk -F '[:, ]' '/^    Stream #...: Video/ {print $10}')"
 AUDIO_FORMAT="$(ffplay -nodisp -an -vn -stats "$INPUT" 2>&1 | awk -F '[:, ]' '/^    Stream #...: Audio/ {print $10}')"
 
-if [ ! x"$VIDEO_FORMAT" == x"h264" ] || [ ! x"$AUDIO_FORMAT" == x"aac" ]
+if [ ! x"$VIDEO_FORMAT" == x"h264" ]
 then
     # We'll need to convert some stuff.
     echo "Needs conversion: Video@ $VIDEO_FORMAT, Audio@ $AUDIO_FORMAT."
     exit 1
 fi
 
-ffmpeg -vcodec copy -acodec copy -i "$INPUT" "$OUTPUT"
+if [ ! x"$AUDIO_FORMAT" == x"aac" ]
+then
+    echo "Converting audio to AAC from $AUDIO_FORMAT."
+    AUDIO_CODEC=libfaac # AAC encoded by libFAAC
+fi
+
+ffmpeg -vcodec copy -i "$INPUT" "$OUTPUT" -acodec "$AUDIO_CODEC"
+    # -vcodec copy must be first, but -acodec copy must be last?!
 
 
 #/opt/local/lib/libdirac_decoder.0.dylib is provided by: dirac
