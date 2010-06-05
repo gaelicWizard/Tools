@@ -6,48 +6,37 @@ set -e
 import trash || return -1
     # Import my trash package for
         # del
+import path || return -1
+    # Import my path package for
+        # bashd_add_to_path_front
 
 INPUT="${1:-/dev/null}"
-AUDIO_FORMAT="${2:-mp3}" # just assume its mp3-in-avi
-AUDIO="${INPUT%.*}.$AUDIO_FORMAT" # just assume its mp3-in-avi
-VIDEO="${INPUT%.*}.h264" # just assume its h264-in-avi (sometimes it lies and claims to be avc1, which it's not. Well, its the same thing but yeah...
-OUTPUT="${INPUT%.*}.m4v"
+OUTPUT="${INPUT%%.*}.mp4"
 
-EXTMPLAYER="/Applications/MPlayer\ OSX\ Extended.app/Contents/Resources/Binaries/mpextended.mpBinaries/Contents/mpextended-mt.mpBinaries/Contents/MacOS"
-if test -e "$EXTMPLAYER/mplayer"
+bashd_add_to_path_front ~/Projects/ffmpeg-x86_64.bundle/Contents/Tools
+
+VIDEO_FORMAT="$(ffplay -nodisp -an -vn -stats "$INPUT" 2>&1 | awk -F '[:, ]' '/^    Stream #...: Video/ {print $10}')"
+AUDIO_FORMAT="$(ffplay -nodisp -an -vn -stats "$INPUT" 2>&1 | awk -F '[:, ]' '/^    Stream #...: Audio/ {print $10}')"
+
+if [ ! x"$VIDEO_FORMAT" == x"h264" ] || [ ! x"$AUDIO_FORMAT" == x"aac" ]
 then
-    PATH="$PATH":"$EXTMPLAYER"
+    # We'll need to convert some stuff.
+    echo "Needs conversion: Video@ $VIDEO_FORMAT, Audio@ $AUDIO_FORMAT."
+    exit 1
 fi
 
-if test -e /opt/local/bin/mp4creator
-then
-    PATH="$PATH":/opt/local/bin
-fi
+ffmpeg -vcodec copy -acodec copy -i "$INPUT" "$OUTPUT"
 
-echo demuxing...
-#mplayer "$INPUT" -vc null -vo null -ao pcm:file="$AUDIOWAV":fast
-VIDEO_CODEC_WITH_BRACKETS="$(mplayer "$INPUT" -dumpaudio -dumpfile "$AUDIO" | awk '/^VIDEO/ {print $2}')"
-VIDEO_CODEC_WITH_END_BRACKET="${VIDEO_CODEC_WITH_BRACKETS:1:99}" 
-VIDEO_CODEC="${VIDEO_CODEC_WITH_END_BRACKET:0:$(( ${#VIDEO_CODEC_WITH_END_BRACKET} - 1 ))}"
-#VIDEO="${VIDEO}.${VIDEO_CODEC}"
-# strip the first and last character to go from 6 to 4 characters
-    # Cleverly try to guess the video codec, but sadly really we just need the h264 stream to be honest about being an h264 stream and not an avc1 stream.
 
-RATE="$(mplayer "$INPUT" -dumpvideo -dumpfile "$VIDEO" | awk '/^VIDEO/ {print $5}')"
-
-if [ x"$AUDIO_FORMAT" != x"aac" ]
-then
-    echo encoding...
-    #faac -r -o "$NEWAUDIO" "$AUDIOWAV" 
-    afconvert -v "$AUDIO" -o "$OUTPUT" --file "mp4f"
-        # Slowest step, so print progress (-v)
-fi
-
-echo muxing...
-#mp4creator -create="$NEWAUDIO" "$OUTPUT"
-mp4creator -create="$VIDEO" -rate="$RATE" "$OUTPUT"
-
-echo done.
-mp4creator -list "$OUTPUT"
-
-del "$AUDIO" "$VIDEO" # "$AUDIOWAV" "$NEWAUDIO"
+#/opt/local/lib/libdirac_decoder.0.dylib is provided by: dirac
+#/opt/local/lib/libdirac_encoder.0.dylib is provided by: dirac
+#/opt/local/lib/libfaac.0.dylib is provided by: faac
+#/opt/local/lib/libfaad.2.dylib is provided by: faad2
+#/opt/local/lib/libmp3lame.0.dylib is provided by: lame
+#/opt/local/lib/libschroedinger-1.0.0.dylib is provided by: schroedinger
+#/opt/local/lib/liboil-0.3.0.dylib is provided by: liboil
+#/opt/local/lib/libtheora.0.dylib is provided by: libtheora
+#/opt/local/lib/libogg.0.dylib is provided by: libogg
+#/opt/local/lib/libvorbisenc.2.dylib is provided by: libvorbis
+#/opt/local/lib/libvorbis.0.dylib is provided by: libvorbis
+#/opt/local/lib/libx264.70.dylib is provided by: x264
