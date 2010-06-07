@@ -1,6 +1,6 @@
 #!/bin/bash --login
 
-set -e
+set -ex
     # Don't fail.
 
 import trash || return -1
@@ -11,19 +11,26 @@ import path || return -1
         # bashd_add_to_path_front
 
 INPUT="${1:-/dev/null}"
-OUTPUT="${INPUT%%.*}.mp4"
-AUDIO_CODEC="copy"
+BASENAME="${INPUT%%.*}"
+OUTPUT="${BASENAME}.mp4"
+AUDIO_CODEC="copy" # default to no-re-encode. (Video is never re-encoded.)
+TEMP_VIDEO="${BASENAME}.h264"
+TEMP_AUDIO="${BASENAME}.aac"
 
+bashd_add_to_path_front /opt/local/bin # MacPorts
 bashd_add_to_path_front ~/Projects/ffmpeg-x86_64.bundle/Contents/Tools
 
-VIDEO_FORMAT="$(ffplay -nodisp -an -vn -stats "$INPUT" 2>&1 | awk -F '[:, ]' '/^    Stream #...: Video/ {print $10}')"
-AUDIO_FORMAT="$(ffplay -nodisp -an -vn -stats "$INPUT" 2>&1 | awk -F '[:, ]' '/^    Stream #...: Audio/ {print $10}')"
+VIDEO_FORMAT="$(ffmpeg -i "$INPUT" 2>&1 | awk -F '[:, ]' '/^    Stream #.*: Video/ {print $10}')"
+AUDIO_FORMAT="$(ffmpeg -i "$INPUT" 2>&1 | awk -F '[:, ]' '/^    Stream #.*: Audio/ {print $10}')"
 
 if [ ! x"$VIDEO_FORMAT" == x"h264" ]
 then
     # We'll need to convert some stuff.
     echo "Needs conversion: Video@ $VIDEO_FORMAT, Audio@ $AUDIO_FORMAT."
     exit 1
+else
+    FRAME_RATE="$(ffmpeg -y -i "$INPUT" -vcodec copy -an "$TEMP_VIDEO" 2>&1 | awk -F '[:, ]' '/^    Stream #.*: Video: h264/ {print $16}')"
+        # Frame rate must be manually specified for mp4creator(1).
 fi
 
 if [ ! x"$AUDIO_FORMAT" == x"aac" ]
@@ -32,7 +39,11 @@ then
     AUDIO_CODEC=libfaac # AAC encoded by libFAAC
 fi
 
-ffmpeg -vcodec copy -i "$INPUT" "$OUTPUT" -acodec "$AUDIO_CODEC"
+ffmpeg -y -i "$INPUT" -acodec "$AUDIO_CODEC" "$TEMP_AUDIO"
+
+mp4creator -create="$TEMP_VIDEO" -r "$FRAME_RATE" "$OUTPUT"
+mp4creator -create="$TEMP_AUDIO" "$OUTPUT"
+#ffmpeg -vcodec copy -i "$INPUT" "$OUTPUT" -acodec "$AUDIO_CODEC"
     # -vcodec copy must be first, but -acodec copy must be last?!
 
 
