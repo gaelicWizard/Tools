@@ -1,6 +1,6 @@
 #!/bin/bash --login
 
-set -ex
+set -e
     # Don't fail.
 
 import trash || return -1
@@ -36,15 +36,15 @@ fi
 if [ ! x"$AUDIO_FORMAT" == x"aac" ]
 then
     echo "Converting audio to AAC from $AUDIO_FORMAT."
-    AUDIO_CODEC=libfaac # AAC encoded by libFAAC
+    AUDIO_CODEC=libfaac # AAC encoded by libFAAC # low quality…
 fi
 
 ffmpeg -y -i "$INPUT" -acodec "$AUDIO_CODEC" "$TEMP_AUDIO"
 
 mp4creator -create="$TEMP_VIDEO" -r "$FRAME_RATE" "$OUTPUT"
 mp4creator -create="$TEMP_AUDIO" "$OUTPUT"
-#ffmpeg -vcodec copy -i "$INPUT" "$OUTPUT" -acodec "$AUDIO_CODEC"
-    # -vcodec copy must be first, but -acodec copy must be last?!
+del "$TEMP_VIDEO" "$TEMP_AUDIO"
+    # Delete the temp files. 
 
 
 #/opt/local/lib/libdirac_decoder.0.dylib is provided by: dirac
