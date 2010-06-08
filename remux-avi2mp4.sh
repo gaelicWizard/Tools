@@ -29,7 +29,7 @@ then
     echo "Needs conversion: Video@ $VIDEO_FORMAT, Audio@ $AUDIO_FORMAT."
     exit 1
 else
-    FRAME_RATE="$(ffmpeg -y -i "$INPUT" -vcodec copy -an "$TEMP_VIDEO" 2>&1 | awk -F '[:, ]' '/^    Stream #.*: Video: h264/ {print $16}')"
+    FRAME_RATE="$(ffmpeg -y -i "$INPUT" -vcodec copy -an "$TEMP_VIDEO" 2>&1 | awk -F '[:, ]' '/^    Stream #.*: Video: h264.*tbr/ {print $16}')"
         # Frame rate must be manually specified for mp4creator(1).
 fi
 
