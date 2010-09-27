@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-### This script takes two arguments: 
-### ### first, the path of the plist to populate; 
-### ### second, the imdbID of the title
+### This script takes one arguments: 
+### ### the path of the plist to populate WITHOUT THE EXTENSION #TODO:FIXME:bug
 
 
 import imdb
@@ -13,20 +12,35 @@ import os
 
 atomicMetadataTrack = os.path.abspath(sys.argv[1])
  # /path/to/plist
-imdbID = sys.argv[2]
+imdbID = subprocess.Popen(
+                            [
+                                "defaults", 
+                                "read", 
+                                atomicMetadataTrack, 
+                                "imdbID"
+                            ], 
+                            stdout=subprocess.PIPE
+                          ).communicate()[0].strip()
 
 if imdbID.isdigit() is False:
+ print imdbID
  die
 
 
 
 i = imdb.IMDb()
 m = i.get_movie(imdbID)
-i.update(m,['taglines', 'dvd', 'all'])
+i.update(m,'all') # overkill
 
 
-def pluralise(that):
- if that in ["cast", "productioncompanies"]:
+def pluraliseOrMap(that):
+ if that in ["writer"]:
+  return "screenwriters"
+ elif that in ["plotoutline"]:
+  return "description" # unused
+ elif that in ["productioncompanies"]:
+  return "studio"
+ elif that in ["cast", "productioncompanies"]:
   return that
  else:
   return that + "s"
@@ -86,11 +100,12 @@ for the_person_type in [ # Code Duplication :-/
     cr+= ");"
    #^p.cr
    
+   print the_person_type+": "+ the_person['name']
    subprocess.call([
                     "defaults", 
                     "write", 
                     atomicMetadataTrack, 
-                    pluralise(the_person_type.replace(" ","")), 
+                    pluraliseOrMap(the_person_type.replace(" ","")), 
                     "-array-add", 
                     "{ name = \"" + the_person['name'] + "\";"
                      +
@@ -109,9 +124,11 @@ for the_metadata_type in [
                           'taglines',
                           'certificates',
                           'locations', 
+                          'keywords',
                          ]:
  if m.has_key(the_metadata_type):
   for the_metadata in m[the_metadata_type]:
+   print the_metadata_type+": "+ the_metadata
    subprocess.call([
                     "defaults", 
                     "write", 
@@ -131,19 +148,15 @@ for the_metadata_type in [
                           'title',
                           'kind',
                           'cover url',
-                          'canonical title',
-                          'smart canonical title', 
                           'full-size cover url',
-
                           'long imdb title', 
-                          'long imdb canonical title', 
-                          'smart long imdb canonical title', 
                          ]:
  if m.has_key(the_metadata_type):
   if isinstance(m[the_metadata_type],int):
    the_metadata = repr(m[the_metadata_type])
   else:
    the_metadata = m[the_metadata_type]
+  print the_metadata_type+": "+ the_metadata
   subprocess.call([
                    "defaults", 
                    "write", 
@@ -152,7 +165,7 @@ for the_metadata_type in [
                    "\""+the_metadata+"\"" # Make sure to produce _extra_ quotes for defaults(1) to parse
                    ])
 
-subprocess.call([ "plutil", "-convert", "xml1", atomicMetadataTrack])
+subprocess.call([ "plutil", "-convert", "xml1", atomicMetadataTrack+".plist"])
  # Convert from binary plist to text-based xml
 
 
