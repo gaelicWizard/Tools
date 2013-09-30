@@ -58,6 +58,7 @@ function usage() {
 [ ! -d .git ] && usage "error: must be ran from within the root of the repository"
 
 dryrun=0
+filter=""
 verbose=""
 repo=$(basename `git rev-parse --show-toplevel`)
 
@@ -77,8 +78,6 @@ while [[ $1 =~ ^\- ]]; do
 
   shift
 done
-
-filter=""
 
 for arg in $@; do
   val=`echo $arg | grep -q '=' && echo 1 || echo 0`
