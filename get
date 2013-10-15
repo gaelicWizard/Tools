@@ -1,0 +1,15 @@
+#!/bin/bash
+
+##
+# TODO: Quarantine all files, not just those which we already know the name for.
+##
+
+remote="$1"
+loc="${2:-}"
+
+curl "${loc:+--output}" "${loc:---remote-name}" -- "$remote"
+
+if [ -z "$loc" ]
+then
+    exec xattr -w 'com.apple.metadata:kMDItemWhereFroms' '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><array><string>'"${remote/&/&amp;}"'</string></array></plist>' "$loc"
+fi
