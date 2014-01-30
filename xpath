@@ -1,0 +1,13 @@
+#!/bin/bash
+
+##
+# Get the text content of all nodes matching xpath($1).
+##
+
+#local -i i
+
+while xmllint --xpath "$2"'[position() = '"${i:=2}"']/text()' "$1" #2>/dev/null
+do 
+	: $((i++)) # increment
+	echo # newline
+done
