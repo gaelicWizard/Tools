@@ -14,7 +14,7 @@
 #                   in other scripts.
 
 EXPORT_FUNCTIONS=true
-PRF="${HOME}/."
+PRF="${XDG_CONFIG_HOME:-$HOME/.config}/bash/"
 
 # Code
 # ----
