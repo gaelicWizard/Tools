@@ -2,7 +2,8 @@
 
 set -e
 
-require trash || return 1
+require trash.bashrc || source ~/Library/init/bash/trash.funcs.bash || exit 1
+    #trash
 
 nice -n 1 ~/Tools/rsync -ahv --xattrs --inplace --progress --cvs-exclude "$@" armitage:Movies/Drop/
     # Don't enable compression b/c ssh does compression itself.

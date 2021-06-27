@@ -1,5 +1,5 @@
 #!/bin/bash
-# Fixed up some linuxism by John Pell <john_screen@gaelicWizard.net>
+# Fixed up some linuxism by John Pell <john+screen@gaelicWizard.net>
 # Changes released as Public Domain.
 # Accept hostname twice to ensure proper function with OpenSSH 4.x
 
