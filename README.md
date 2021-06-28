@@ -106,18 +106,19 @@ There are few knobs you can turn to make `bashrc_dispatch` behave as you prefer.
 Authors
 -------
 
-* Joseph Wecker
-* Gioele Barabucci <http://svario.it/gioele> (fixes and optimizations)
+* [Joseph Wecker](https://github.com/josephwecker) (initial author)
+* [Gioele Barabucci](https://svario.it/gioele) (fixes and optimizations)
+* [John Pell](https://github.com/gaelicWizard) (fixes and optimizations)
 
 
 Development
 -----------
 
 Code
-: <https://github.com/josephwecker/bashrc_dispatch>
+: <https://github.com/gaelicWizard/bashrc_dispatch>
 
 Report issues
-: <https://github.com/josephwecker/bashrc_dispatch/issues>
+: <https://github.com/gaelicWizard/bashrc_dispatch/issues>
 
 
 License
