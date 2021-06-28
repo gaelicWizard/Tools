@@ -22,7 +22,7 @@ below):
 
 *  `~/.bashrc`
 *  `~/.bash_profile`
-*  `~/.profile`  (only if your scripts are all 'bash' compatible- otherwise get rid of it altogether)
+*  `~/.profile`  (better to just get rid of it altogether)
 *  `~/.bash_login`
 
 And then you can use these instead (in ~/.config/bash):
@@ -94,14 +94,13 @@ There are few knobs you can turn to make `bashrc_dispatch` behave as you prefer.
 
 * `EXPORT_FUNCTIONS`: set it to `false` to disable the export of
   `$SHELL_PLATFORM` and all the `shell_is_*` functions and avoid polluting all
-   the other shells' environments.
+  the other shells' environments.
 
 * Inside `bashrc_dispatch` you can change `PRF=` to a location other than
   `${HOME}/.` to have it look for your new `bashrc_*` scripts somewhere else.
 
-* In general, modify your `bashrc_dispatch` script as much as you need to.
-  You'll see there's not a lot of code there. Much less code then there are
-  comments in this readme. Please share a patch if you like your modification.
+* If you find you need to modify your `bashrc_dispatch` script, please submit a
+  patch if you like your modification.
 
 Authors
 -------
