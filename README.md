@@ -22,7 +22,7 @@ below):
 
 *  `~/.bashrc`
 *  `~/.bash_profile`
-*  `~/.profile`  (only if your scripts are all 'sh' compatible- otherwise get rid of it altogether)
+*  `~/.profile`  (only if your scripts are all 'bash' compatible- otherwise get rid of it altogether)
 *  `~/.bash_login`
 
 And then you can use these instead:
