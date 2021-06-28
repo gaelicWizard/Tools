@@ -2,10 +2,9 @@
 
 # Launch different bash configuration for Linux vs OSX, interactive vs batch
 #
-# More info at https://github.com/josephwecker/bashrc_dispatch
+# More info at https://github.com/gaelicWizard/bashrc_dispatch
 #
 # License: Public Domain.
-# Author:  Joseph Wecker, 2012
 
 # Configuration
 # -------------
