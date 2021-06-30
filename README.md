@@ -56,6 +56,7 @@ In addition to the dispatching, you'll forever have the following available:
 * `$SHELL_PLATFORM` (either `LINUX`, `OSX`, `BSD`, `CYGWIN` or `OTHER`),
 * `shell_is_linux`,
 * `shell_is_osx`,
+* `shell_is_bsd`,
 * `shell_is_cygwin`,
 * `shell_is_interactive`,
 * `shell_is_script`.
@@ -123,4 +124,3 @@ License
 -------
 
 This is free software released into the public domain.
-
