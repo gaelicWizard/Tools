@@ -1,7 +1,0 @@
-{
-  "name": "rmate",
-  "version": "1.0.2",
-  "description": "Remote TextMate 2 implemented as shell script",
-  "scripts": [ "rmate" ],
-  "install": "make install"
-}
