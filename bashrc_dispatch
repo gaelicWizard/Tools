@@ -13,7 +13,7 @@
 # PRF: set location for scripts to import
 
 EXPORT_FUNCTIONS=true
-PRF="${XDG_CONFIG_HOME:-$HOME/.config}/bash/"
+PRF="${XDG_CONFIG_HOME:-$HOME/.config}/Bash/"
 
 # Code
 # ----
