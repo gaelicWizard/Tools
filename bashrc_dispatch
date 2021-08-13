@@ -13,22 +13,21 @@
 # PRF: set location for scripts to import
 
 EXPORT_FUNCTIONS=true
-PRF="${XDG_CONFIG_HOME:-$HOME/.config}/Bash/"
+PRF="${XDG_CONFIG_HOME:-$HOME/.config}/bash/"
 
 # Code
 # ----
 
 # Avoid recursive invocation
 
-[ -n "$BASHRC_DISPATCH_PID" ] && [ $$ -eq "$BASHRC_DISPATCH_PID" ] && return
+[[ -n "${BASHRC_DISPATCH_PID:-}" && $$ -eq "$BASHRC_DISPATCH_PID" ]] && return
 BASHRC_DISPATCH_PID=$$
 
 
 # Setup the main shell variables and functions
 
-if [ -z "$SHELL_PLATFORM" ]
+if [[ "${SHELL_PLATFORM:=OTHER}" == "OTHER" ]]
 then
-    SHELL_PLATFORM='OTHER'
     case "$OSTYPE" in
       *'linux'*   ) SHELL_PLATFORM='LINUX' ;;
       *'darwin'*  ) SHELL_PLATFORM='OSX' ;;
@@ -45,7 +44,7 @@ then
   shell_is_cygwin       () { false ; }
   shell_is_login        () { shopt -q login_shell ; }
   shell_is_interactive  () { [[ "$-" == *'i'* ]] ; }
-  shell_is_script       () { ! shell_is_interactive ; }
+  shell_is_script       () { [[ "$-" != *'i'* ]] ; }
 
   case "$OSTYPE" in
     *'linux'*   )  shell_is_linux  () { true ; }  ;;
@@ -58,16 +57,18 @@ fi
 
 # Make $BASH_ENV the same in interactive and non-interactive scripts
 
-[ -z "$BASH_ENV" ] && export BASH_ENV="$BASH_SOURCE"
+: ${BASH_ENV:=$BASH_SOURCE} 
+export BASH_ENV
 
 
 # Make these available to the potentially convoluted bashrc_* startup scripts
 
-if $EXPORT_FUNCTIONS
+if ${EXPORT_FUNCTIONS:=true}
 then
     typeset -rx SHELL_PLATFORM
     typeset -frx shell_is_linux
     typeset -frx shell_is_osx
+    typeset -frx shell_is_bsd
     typeset -frx shell_is_cygwin
     typeset -frx shell_is_login
     typeset -frx shell_is_interactive
@@ -76,15 +77,15 @@ fi
 
 # Now dispatch special files
 
-if [ -f "${PRF}bashrc_once"  ] && [ -z "$BRCD_RANONCE" ]
+if [[ -f "${PRF}bashrc_once" && -z "${BRCD_RANONCE:-}" ]]
 then
   export BRCD_RANONCE=true
   . "${PRF}bashrc_once"
 fi
-[ -f "${PRF}bashrc_all" ]                                   && . "${PRF}bashrc_all"
-[ -f "${PRF}bashrc_script" ]      && shell_is_script        && . "${PRF}bashrc_script"
-[ -f "${PRF}bashrc_interactive" ] && shell_is_interactive   && . "${PRF}bashrc_interactive"
-[ -f "${PRF}bashrc_login" ]       && shell_is_login         && . "${PRF}bashrc_login"
+[[ -f "${PRF}bashrc_all" ]]                                   && . "${PRF}bashrc_all"
+[[ -f "${PRF}bashrc_script" ]]      && shell_is_script        && . "${PRF}bashrc_script"
+[[ -f "${PRF}bashrc_interactive" ]] && shell_is_interactive   && . "${PRF}bashrc_interactive"
+[[ -f "${PRF}bashrc_login" ]]       && shell_is_login         && . "${PRF}bashrc_login"
 
 
 # Unset variables if necessary to avoid env polution
@@ -92,7 +93,6 @@ fi
 if ! $EXPORT_FUNCTIONS
 then
     unset SHELL_PLATFORM
-    unset BASHRC_DISPATCH_PID
     unset -f shell_is_linux
     unset -f shell_is_osx
     unset -f shell_is_bsd
