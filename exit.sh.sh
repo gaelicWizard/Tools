@@ -1,9 +1,19 @@
 #!/bin/sh
-src=/usr/include/sysexits.h
+#
+# Generate a shell equivalent to <sysexits.h>
+
+if [[ -r "${src:=/usr/include/sysexits.h}" ]]
+then : "${src}"
+elif [[ -d "${sdk:=$(xcrun --show-sdk-path)}" ]]
+then : "${sdk}${src}"
+	src="${sdk}${src}"
+fi
+
 echo "# Generated from \"$src\"" 
 echo "# Please inspect the source file for more detailed descriptions"
 echo
-< "$src" sed -rn 's/^#define  *(\w+)\s*(\d*)/\1=\2/p'| sed 's:/\*:#:; s:\*/::'
+perl -nE 'print if s/^#define\s+(\w+)\s+(\d+).*$/\1=\2/p' "$src"
+
 cat<<'EOF'
 
 #System errors
