@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -euo pipefail # strict mode
+#set -x
+
+TEXfile="${1?}"
+TEXargs="${2-}"
+TEXbin="${3-}"
+
+LaTeX="${0##*/}"
+LaTeX="${LaTeX%.engine}"
+LaTeX="$(awk '{print tolower($0)}' <<< "${LaTeX}")"
+
+TSBIN="${HOME?}/Library/TeXShop/bin" # TeXShop bundled scripts
+LTMKBIN="${TSBIN?}/tslatexmk"        # TeXShop-bundled LaTeXmk
+
+PATH="${TEXbin?}:${LTMKBIN?}:${PATH?}"
+
+LTMKRCRO="${LTMKBIN?}/latexmkrcDONTedit" # default
+LTMKRCRW="${TSBIN?}/latexmkrcedit"     # wtf
+# make sure latexmkrcedit exists in bin
+if [[ ! -e "${LTMKRCRW?}" ]]; then
+	LTMKRC="${LTMKRCRO?}"
+else
+	LTMKRC="${LTMKRCRW?}"
+fi
+
+# Use local rc file platexmkrc if it exists. p = project
+if [[ -e ./platexmkrc ]]; then
+	localrc="./platexmkrc"
+fi
+# Add the requested options to $pdflatex if there
+#exec latexmk -pdf -r "${LTMKRC}" -e "\$TSUserCompileOptions='${TEXargs}'" -pdflatex="${LaTeX?}" -r "${localrc:-/dev/null}" "${TEXfile?}"
+exec latexmk -pdf -r "${LTMKRC}" -e "\$TSUserCompileOptions='${TEXargs}'" -r "${LTMKBIN?}/${LaTeX?}mkrc" -r "${localrc:-/dev/null}" "${TEXfile?}"
