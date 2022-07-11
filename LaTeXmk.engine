@@ -1,26 +1,30 @@
-#!/bin/bash
+#!/bin/sh
 
 set -euo pipefail # strict mode
-#set -x
+#set -x # verbose mode
 
-TEXfile="${1?}"
-TEXargs="${2-}"
-TEXbin="${3-}"
+# command-line arguments
+TEXfile="${1?}" # file to compile
+TEXargs="${2-}" # user-supplied arguments to engine
+TEXbin="${3-}" # path to TeX distrubution executables
 
-LaTeX="${0##*/}"
-LaTeX="${LaTeX%.engine}"
-LaTeX="$(awk '{print tolower($0)}' <<< "${LaTeX}")"
+# determine which compiler to use, based on my own file name
+LaTeX="${LaTeX:-${0##*/}}" # get my file name
+LaTeX="${LaTeX%.engine}" # lose the file extension
+LaTeX="$(awk '{print tolower($0)}' <<< "${LaTeX}")" # convert to lower-case
 
-TSBIN="${HOME?}/Library/TeXShop/bin" # TeXShop bundled scripts
+# locate support files
+TSBIN="${HOME?}/Library/TeXShop/bin" # TeXShop-bundled scripts
 LTMKBIN="${TSBIN?}/tslatexmk"        # TeXShop-bundled LaTeXmk
 
-PATH="${TEXbin?}:${LTMKBIN?}:${PATH?}"
+# set the path: 1) distribution binaries, 2) LaTeXmk scripts, 3) TeXShop scripts, 4) regular path.
+PATH="${TEXbin?}:${LTMKBIN?}:${TSBIN?}:${PATH?}"
 
+# locate the editable configuration file, or use the default
 LTMKRCRO="${LTMKBIN?}/latexmkrcDONTedit" # default
-LTMKRCRW="${TSBIN?}/latexmkrcedit"     # wtf
-# make sure latexmkrcedit exists in bin
+LTMKRCRW="${TSBIN?}/latexmkrcedit"     # user-edited
 if [[ ! -e "${LTMKRCRW?}" ]]; then
-	LTMKRC="${LTMKRCRO?}"
+	[[ -e "${LTMKRCRO?}" ]] && LTMKRC="${LTMKRCRO?}"
 else
 	LTMKRC="${LTMKRCRW?}"
 fi
@@ -30,5 +34,4 @@ if [[ -e ./platexmkrc ]]; then
 	localrc="./platexmkrc"
 fi
 # Add the requested options to $pdflatex if there
-#exec latexmk -pdf -r "${LTMKRC}" -e "\$TSUserCompileOptions='${TEXargs}'" -pdflatex="${LaTeX?}" -r "${localrc:-/dev/null}" "${TEXfile?}"
-exec latexmk -pdf -r "${LTMKRC}" -e "\$TSUserCompileOptions='${TEXargs}'" -r "${LTMKBIN?}/${LaTeX?}mkrc" -r "${localrc:-/dev/null}" "${TEXfile?}"
+exec latexmk -r "${LTMKRC:-/dev/null}" "-${LaTeX}" -latexoption="${TEXargs} -8bit --synctex=1 -file-line-error" -r "${localrc:-/dev/null}" -time "${TEXfile}" 
